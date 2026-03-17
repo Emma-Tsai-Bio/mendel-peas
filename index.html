@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>孟德爾的碗豆之謎</title>
+  <title>孟德爾的豌豆之謎</title>
   
   <!-- 載入 React 核心庫 -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -88,7 +88,7 @@
       </div>
     );
 
-    const WoodButton = ({ onClick, children, disabled, variant = 'primary' }) => {
+    const WoodButton = ({ onClick, children, disabled, variant = 'primary', className = '' }) => {
       const baseStyle = "w-full py-3 px-4 rounded-lg font-bold text-center transition-all duration-200 flex justify-center items-center gap-2 shadow-md";
       const variants = {
         primary: "bg-[#8b5a2b] text-white border-b-4 border-[#5c4033] hover:bg-[#a0522d] active:translate-y-1 active:border-b-0",
@@ -97,7 +97,7 @@
       };
       
       return (
-        <button onClick={onClick} disabled={disabled} className={`${baseStyle} ${variants[variant]} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+        <button onClick={onClick} disabled={disabled} className={`${baseStyle} ${variants[variant]} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}>
           {children}
         </button>
       );
@@ -309,7 +309,7 @@
 
     // --- 主應用程式 ---
     function App() {
-      const [level, setLevel] = useState(0);
+      const [level, setLevel] = useState(-1);
 
       const levelNames = [
         "第零關：尋找純品系的考驗",
@@ -384,6 +384,37 @@
            setDraggedLeftIds([]);
         }
       };
+
+      // --- 渲染遊戲封面 (關卡 -1) ---
+      const renderCover = () => (
+        <div className="flex flex-col items-center justify-center w-full h-screen bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9] relative overflow-hidden">
+          {/* 背景裝飾植物 */}
+          <div className="absolute top-10 left-10 opacity-30 transform -rotate-12 scale-150 pointer-events-none drop-shadow-xl">
+            <Plant type="pea" height="tall" />
+          </div>
+          <div className="absolute bottom-10 right-10 opacity-30 transform rotate-12 scale-150 pointer-events-none drop-shadow-xl">
+            <Plant type="pea" height="short" />
+          </div>
+
+          {/* 主內容區塊 */}
+          <div className="bg-white/80 p-10 md:p-16 rounded-3xl shadow-2xl border-4 border-[#a5d6a7] z-10 text-center max-w-3xl mx-4 backdrop-blur-sm animate-fade-in-up">
+            <h1 className="text-4xl md:text-6xl font-black text-[#2e7d32] mb-6 drop-shadow-md tracking-wide">
+              🌻 孟德爾的豌豆之謎
+            </h1>
+            <p className="text-lg md:text-2xl text-[#5c4033] leading-relaxed mb-10 font-bold">
+              19世紀的修道院花園裡，隱藏著生命傳承的偉大密碼...<br/>
+              跟隨遺傳學之父孟德爾的腳步，親手種下豌豆，<br/>
+              一步步解開控制高矮、花色的世紀之謎！
+            </p>
+            <button 
+              onClick={() => goToLevel(0)}
+              className="text-xl md:text-2xl bg-[#8b5a2b] text-white border-b-4 border-[#5c4033] hover:bg-[#a0522d] active:translate-y-1 active:border-b-0 py-4 px-10 rounded-2xl font-bold shadow-lg transition-all"
+            >
+              🚀 開始挑戰
+            </button>
+          </div>
+        </div>
+      );
 
       // --- 渲染第零關：尋找純品系 ---
       const renderLevel0 = () => {
@@ -800,7 +831,7 @@
             <Notebook text={text} subText={config.title} success={isGridFull ? "完美破解！" : ""}>
               {isGridFull && mode === 'tutorial' && ( <WoodButton onClick={() => goToLevel(5)}>➡️ 進入總複習實戰</WoodButton> )}
               {isGridFull && mode === 'sandbox' && ( <WoodButton onClick={() => goToLevel(6)}>🎁 解鎖隱藏番外篇</WoodButton> )}
-              {isGridFull && mode === 'bonus' && ( <WoodButton onClick={() => goToLevel(1)}>🔄 重新體驗孟德爾的碗豆之謎</WoodButton> )}
+              {isGridFull && mode === 'bonus' && ( <WoodButton onClick={() => goToLevel(1)}>🔄 重新體驗孟德爾的豌豆之謎</WoodButton> )}
             </Notebook>
             
             <FarmStage>
@@ -975,19 +1006,25 @@
 
       return (
         <div className="flex flex-col md:flex-row h-screen w-full bg-[#fdf5e6] font-sans text-gray-800 overflow-hidden">
-          <div className="md:hidden w-full bg-[#8b5a2b] p-2 flex justify-between items-center text-white px-4 shrink-0 z-50">
-            <div className="font-bold text-sm">🌻 孟德爾的碗豆之謎</div><div className="text-xs">{levelNames[level] || `關卡 ${level}`}</div>
-          </div>
-          <div className="hidden md:flex absolute top-4 right-8 z-50 bg-white/90 px-6 py-2 rounded-full shadow-md items-center gap-4 border-2 border-[#deb887]">
-             <span className="font-bold text-[#8b5a2b]">解謎進度</span>
-             <div className="flex gap-2">
-                {[0, 1, 2, 3, 4, 5, 6].map(l => (
-                  <div key={l} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-sm transition-all ${level === l ? 'bg-[#4ade80] text-green-900 border-2 border-white scale-110' : level > l ? 'bg-[#a5d6a7] text-white' : 'bg-gray-200 text-gray-400'}`}>
-                    {l === 0 ? 'P' : l > level ? l : '✓'}
-                  </div>
-                ))}
-             </div>
-          </div>
+          {level >= 0 && (
+            <>
+              <div className="md:hidden w-full bg-[#8b5a2b] p-2 flex justify-between items-center text-white px-4 shrink-0 z-50">
+                <div className="font-bold text-sm">🌻 孟德爾的豌豆之謎</div><div className="text-xs">{levelNames[level] || `關卡 ${level}`}</div>
+              </div>
+              <div className="hidden md:flex absolute top-4 right-8 z-50 bg-white/90 px-6 py-2 rounded-full shadow-md items-center gap-4 border-2 border-[#deb887]">
+                 <span className="font-bold text-[#8b5a2b]">解謎進度</span>
+                 <div className="flex gap-2">
+                    {[0, 1, 2, 3, 4, 5, 6].map(l => (
+                      <div key={l} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-sm transition-all ${level === l ? 'bg-[#4ade80] text-green-900 border-2 border-white scale-110' : level > l ? 'bg-[#a5d6a7] text-white' : 'bg-gray-200 text-gray-400'}`}>
+                        {l === 0 ? 'P' : l > level ? l : '✓'}
+                      </div>
+                    ))}
+                 </div>
+              </div>
+            </>
+          )}
+
+          {level === -1 && renderCover()}
           {level === 0 && renderLevel0()}
           {level === 1 && renderLevel1()} 
           {level === 2 && renderLevel2()} 
