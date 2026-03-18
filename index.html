@@ -77,7 +77,7 @@
         {/* 內容區塊 */}
         <div className="flex-1 overflow-y-auto w-full relative z-10">
           <div className="flex flex-col w-full min-h-full">
-            <div className="my-auto flex flex-col items-center gap-12 py-12 shrink-0 px-4 md:px-8">
+            <div className="my-auto flex flex-col items-center justify-center gap-12 py-12 shrink-0 px-4 md:px-8 h-full">
               {children}
             </div>
           </div>
@@ -153,13 +153,17 @@
         <div className="flex flex-col items-center justify-end mx-2 md:mx-4 relative transition-all duration-500">
           {label && <div className="bg-white/90 px-3 py-1 rounded-full text-sm font-bold text-green-800 mb-2 shadow-md border-2 border-green-200 absolute -top-8 whitespace-nowrap z-10 animate-fade-in-up">{label}</div>}
           <div className="relative flex justify-center items-end" style={{ height: '160px' }}>
-            {type === 'flower-pink' || type === 'flower-spotted' ? (
+            {type.startsWith('flower') ? (
                <div className={`w-16 ${isTall ? 'h-32' : 'h-16'} flex flex-col items-center justify-end ${conditionStyle}`}>
-                <div className={`w-12 h-12 rounded-full mb-[-10px] z-10 flex items-center justify-center shadow-inner ${type === 'flower-pink' ? 'bg-pink-400' : 'bg-red-500'}`}>
+                <div className={`w-12 h-12 rounded-full mb-[-10px] z-10 flex items-center justify-center shadow-inner border-2 border-black/10 ${
+                  type === 'flower-pink' ? 'bg-pink-400' :
+                  type === 'flower-white' ? 'bg-[#f8f9fa]' :
+                  'bg-red-500'
+                }`}>
                   {type === 'flower-spotted' && (
                     <><div className="w-4 h-4 bg-white rounded-full absolute top-1 left-2"></div><div className="w-3 h-3 bg-white rounded-full absolute bottom-2 right-2"></div><div className="w-5 h-5 bg-white rounded-full absolute top-5 left-5"></div></>
                   )}
-                  <div className="w-3 h-3 bg-yellow-300 rounded-full"></div>
+                  <div className="w-3 h-3 bg-yellow-300 rounded-full shadow-sm"></div>
                 </div>
                 <div className={`w-3 bg-green-500 rounded-t-full ${isTall ? 'h-24' : 'h-12'}`}></div>
               </div>
@@ -284,15 +288,11 @@
                <span className={`text-xl md:text-3xl font-black ${
                   visualData.visual === 'tall' ? 'text-green-700' :
                   visualData.visual === 'short' ? 'text-amber-700' :
-                  visualData.visual === 'red' ? 'text-red-600' :
-                  visualData.visual === 'white' ? 'text-gray-500' :
                   visualData.visual === 'flower-pink' ? 'text-pink-500' :
                   'text-red-800'
                }`}>
                   {visualData.visual === 'tall' ? '高莖' :
                    visualData.visual === 'short' ? '矮莖' :
-                   visualData.visual === 'red' ? '紅花' :
-                   visualData.visual === 'white' ? '白花' :
                    visualData.visual === 'flower-pink' ? '粉紅花' :
                    '斑點花'}
                </span>
@@ -321,7 +321,7 @@
         "番外篇：大自然的驚喜彩蛋"
       ];
 
-      // 關卡 0 (純品系前傳)
+      // 關卡 0
       const [l0Step, setL0Step] = useState(0);
       const [l0Gen, setL0Gen] = useState(1);
       const [isSelfing, setIsSelfing] = useState(false);
@@ -329,22 +329,15 @@
 
       const triggerSelfing = (nextStep, nextGen) => {
         setIsSelfing(true);
-        setTimeout(() => {
-            setIsSelfing(false);
-            if(nextGen) setL0Gen(nextGen);
-            setL0Step(nextStep);
-        }, 1500); 
+        setTimeout(() => { setIsSelfing(false); if(nextGen) setL0Gen(nextGen); setL0Step(nextStep); }, 1500); 
       };
 
       const handlePull = () => {
         setIsPulling(true);
-        setTimeout(() => {
-          setIsPulling(false);
-          setL0Step(2);
-        }, 800); 
+        setTimeout(() => { setIsPulling(false); setL0Step(2); }, 800); 
       };
 
-      // 其他關卡狀態
+      // 關卡 1~3
       const [l1Step, setL1Step] = useState(0);
       const [l2Step, setL2Step] = useState(0); 
       const [l2Selections, setL2Selections] = useState({}); 
@@ -354,15 +347,15 @@
       const [l3Step, setL3Step] = useState(0); 
       const [l3Error, setL3Error] = useState("");
       const [l3Success, setL3Success] = useState("");
+      
+      // 棋盤方格共用狀態
       const [punnettGrid, setPunnettGrid] = useState(Array(4).fill(null).map(() => ({ top: null, left: null })));
       const [pStep, setPStep] = useState(0);
       const [l4Hint, setL4Hint] = useState("");
-      const [leftAxis, setLeftAxis] = useState([null, null]);
-      const [draggedLeftIds, setDraggedLeftIds] = useState([]);
       
       // 關卡 5 狀態
       const [l5Step, setL5Step] = useState(0);
-      const [l5View, setL5View] = useState('main'); // 'main' | 'punnett-p' | 'punnett-f1'
+      const [l5View, setL5View] = useState('main'); 
       const [l5P1, setL5P1] = useState("");
       const [l5P2, setL5P2] = useState("");
       const [l5F1, setL5F1] = useState("");
@@ -371,37 +364,33 @@
       const [l5Error, setL5Error] = useState("");
       const [l5Success, setL5Success] = useState("");
 
+      // 關卡 6 狀態
+      const [l6Plant, setL6Plant] = useState(null); 
+      const [l6GuessResult, setL6GuessResult] = useState(null); 
+      const [l6Error, setL6Error] = useState("");
+      const [l6Success, setL6Success] = useState("");
+
       const goToLevel = (l) => {
         setLevel(l); 
         setL0Step(0); setL0Gen(1); setIsSelfing(false); setIsPulling(false);
         setL1Step(0); 
         setL2Step(0); setL2Selections({}); setL2ErrorFields([]); setL2Error(""); setL2Success(""); 
         setL3Step(0); setL3Error(""); setL3Success(""); 
-        setPunnettGrid(Array(4).fill(null).map(() => ({ top: null, left: null }))); setPStep(0); setL4Hint("");
         
-        // 關卡 5 初始化
         setL5Step(0); setL5View('main'); setL5P1(""); setL5P2(""); setL5F1(""); setL5F2Tall(""); setL5F2Short(""); setL5Error(""); setL5Success("");
         
-        if (l === 4 || l === 6) {
-           setLeftAxis(l === 6 ? ['W', 'W'] : ['T', 't']);
-           setDraggedLeftIds([0, 1]);
-           setPStep(1);
-        } else {
-           setLeftAxis([null, null]);
-           setDraggedLeftIds([]);
-        }
+        setL6Plant(null); setL6GuessResult(null); setL6Error(""); setL6Success("");
+        
+        setPunnettGrid(Array(4).fill(null).map(() => ({ top: null, left: null }))); 
+        setPStep(0); setL4Hint("");
       };
 
       const openL5Punnett = (mode) => {
-        setLeftAxis([null, null]);
-        setDraggedLeftIds([]);
         setPunnettGrid(Array(4).fill(null).map(() => ({ top: null, left: null })));
-        setPStep(0);
-        setL4Hint("");
-        setL5View(`punnett-${mode}`);
+        setPStep(0); setL4Hint(""); setL5View(`punnett-${mode}`);
       };
 
-      // --- 渲染遊戲封面 (關卡 -1) ---
+      // --- 渲染遊戲封面 ---
       const renderCover = () => (
         <div className="flex flex-col items-center justify-center w-full h-screen bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9] relative overflow-hidden">
           <div className="absolute top-10 left-10 opacity-30 transform -rotate-12 scale-150 pointer-events-none drop-shadow-xl">
@@ -438,7 +427,7 @@
         if (l0Step === 2 && !isPulling) text = `太好了！矮莖已經被淘汰。\n\n我們要把剩下的高莖繼續自交，直到再也不會生出矮莖為止！\n\n(目前繁衍代數：第 ${l0Gen} 代)`;
         if (l0Step === 3) text = "太棒了！經過好幾個世代的淘汰與自交，現在不管怎麼生，100% 都是高莖了！\n\n特徵終於『穩定』下來了。";
         if (l0Step === 4) text = "等等，特徵穩定就夠了嗎？\n\n如果在惡劣的環境下，它還能保持純品系的特徵嗎？";
-        if (l0Step === 5) text = "天啊！這批純品系的種子種在惡劣的環境中，因為發育不良，只能長得矮矮的！\n\n你覺得如果收集這些『因為環境而長不高』的豌豆種子，拿回好土裡重新種植，下一代會長出什麼？";
+        if (l0Step === 5) text = "天啊！這批純品系的種子種在惡劣的環境中，因為缺乏營養發育不良，只能長得矮矮的！\n\n你覺得如果收集這些『因為環境而長不高』的豌豆種子，拿回營養的好土裡重新種植，下一代會長出什麼？";
         if (l0Step === 6) text = "這就是『純品系』的真諦！\n\n只要遺傳穩定下來，即使惡劣的環境讓它這一代發育不良長不高，隱藏在種子裡的『高莖特徵（基因）』也絕不會改變！\n\n(💡 順帶一提，純品系的『矮莖豌豆』也是用一樣的淘汰與自交方式培育出來的喔！)\n\n我們終於準備好可以開始實驗了！";
 
         return (
@@ -455,11 +444,9 @@
 
             <FarmStage isRaining={l0Step === 5}>
               {l0Step === 0 && (
-                <div className="flex justify-center w-full animate-fade-in-up items-end mt-12">
-                   <div className="relative">
-                      {isSelfing && <SelfingArrow />}
-                      <Plant type="pea" height="tall" name="野外的高莖" generation="第 1 代" />
-                   </div>
+                <div className="relative mt-12">
+                   {isSelfing && <SelfingArrow />}
+                   <Plant type="pea" height="tall" name="野外的高莖" generation="第 1 代" />
                 </div>
               )}
               
@@ -587,7 +574,7 @@
             if (tallGene !== 'T') setL2Error("高莖植物應該擁有顯性的 [ T ] 喔！");
             else setL2Error("這株明明是矮莖，如果你選 [ T ] 它就會變成高莖啦！");
           } else {
-            setL2Success("太棒了！高莖確實是 [ T ]，矮莖確實需要純種的 [ t ] 才能表現出來！\n\n(請點擊下方按鈕繼續思考)");
+            setL2Success("太棒了！高莖確實是 [ T ]，矮莖確實需要純品系的 [ t ] 才能表現出來！\n\n(請點擊下方按鈕繼續思考)");
           }
         };
 
@@ -724,45 +711,23 @@
         );
       };
 
-      // --- 渲染關卡 4, 6：獨立的沙盒組件 ---
-      const renderL4AndL6Square = (mode) => {
-        const config = mode === 'tutorial' ? {
-            title: levelNames[4], parentType: 'pea', pTop: ['T', 't'], pLeft: ['T', 't'], genP: "親代 P", genF: "第一子代 F1", genChild: "第二子代 F2",
-            text0: "還記得九九乘法表怎麼看嗎？找上面的數字，配對左邊的數字！\n\n上方的綠色植株已經自動拆解。\n\n請用滑鼠『按住並拖曳』左側植株上的橘色種子，放進左側對應的虛線圈圈中，完成拆解！",
-            text1: "【示範第一格：十字交叉法】\n\n上方落下的 [ T ] 與左側過來的 [ T ] 在左上角交會。\n\n請用滑鼠『按住並拖曳』黃色光束對應的基因，把它們放進發光的格子裡！",
-            text2: "換你了！\n\n請依照十字交叉的規則，將邊緣的基因『拖曳』到剩下的三顆種子空位配對吧！",
+      // --- 渲染關卡 4：新手教學 ---
+      const renderLevel4Tutorial = () => {
+        const config = {
+            title: levelNames[4],
+            topLabel: "第一子代 (Tt)", leftLabel: "第一子代 (Tt)",
+            pTop: ['T', 't'], pLeft: ['T', 't'],
+            genChild: "第二子代 F2",
+            text0: "還記得九九乘法表怎麼看嗎？找上面的數字，配對左邊的數字！\n\n上方和左側分別代表兩個親代的遺傳因子。\n\n【示範第一格：十字交叉法】\n上方落下的 [ T ] 與左側過來的 [ T ] 在左上角交會。\n\n請用滑鼠『按住並拖曳』黃色光束對應的基因，把它們放進發光的格子裡！",
+            text1: "換你了！\n\n請依照十字交叉的規則，將邊緣的基因『拖曳』到剩下的三顆種子空位配對吧！",
             textSuccess: "登登！三株高莖、一株矮莖，完美吻合孟德爾的 3:1 實驗結果！\n\n你成功證明了法則！"
-          } : {
-            title: levelNames[6], parentType: 'flower', pTop: ['R', 'W'], pLeft: ['R', 'W'], genP: "第一子代 F1", genF: "第二子代 F2", genChild: "第二子代 F2", 
-            text0: "小大師你好！我是研究花朵的植物學家。\n\n孟德爾法則並不是唯一！來看看大自然的兩種驚喜：\n1. 【不完全顯性】(紫茉莉)\n2. 【共顯性】(茶花)\n\n請用 R(紅) 與 W(白) 進行配對看看會發生什麼事！",
-            textSuccess: "大自然真奇妙！\n\n【粉紅花】：R和W勢均力敵，只好各退一步混合，這叫『不完全顯性』。\n\n【紅白斑點花】：R和W全都要表現，互不退讓，這叫『共顯性』！"
-          };
+        };
 
         const isGridFull = punnettGrid.every(cell => cell.top !== null && cell.left !== null);
-        
-        const handleLeftAxisDrop = (e, index) => {
-          const source = e.dataTransfer.getData('source');
-          if (source !== 'leftPlant') return; 
-          if (leftAxis[index] !== null) return; 
-
-          const gene = e.dataTransfer.getData('gene');
-          const id = parseInt(e.dataTransfer.getData('id'), 10);
-
-          setLeftAxis(prev => {
-              const next = [...prev];
-              next[index] = gene;
-              if (next[0] !== null && next[1] !== null) {
-                  setTimeout(() => setPStep(1), 400); 
-              }
-              return next;
-          });
-          setDraggedLeftIds(prev => [...prev, id]);
-        };
 
         const handleGridDrop = (e, cellIndex) => {
           e.preventDefault();
-          if (mode === 'tutorial' && pStep === 0) return; 
-          if (mode === 'tutorial' && pStep === 1 && cellIndex !== 0) return; 
+          if (pStep === 0 && cellIndex !== 0) return; 
 
           const source = e.dataTransfer.getData('source'); 
           const gene = e.dataTransfer.getData('gene');
@@ -772,14 +737,10 @@
           const row = Math.floor(cellIndex / 2);
 
           if (source === 'top' && sourceIndex !== col) {
-              setL4Hint("請拖曳到對應的『正下方』格子喔！");
-              setTimeout(() => setL4Hint(""), 3000);
-              return;
+              setL4Hint("請拖曳到對應的『正下方』格子喔！"); setTimeout(() => setL4Hint(""), 3000); return;
           }
           if (source === 'left' && sourceIndex !== row) {
-              setL4Hint("請拖曳到對應的『正右方』格子喔！");
-              setTimeout(() => setL4Hint(""), 3000);
-              return;
+              setL4Hint("請拖曳到對應的『正右方』格子喔！"); setTimeout(() => setL4Hint(""), 3000); return;
           }
 
           setPunnettGrid(prev => {
@@ -787,146 +748,89 @@
               next[cellIndex] = { ...next[cellIndex] };
               if (source === 'top') next[cellIndex].top = gene;
               if (source === 'left') next[cellIndex].left = gene;
-
-              // 自動校正大寫不影響渲染迴圈
-              let combined = (next[cellIndex].top || '') + (next[cellIndex].left || '');
-              if (combined === 'tT') {
-                  next[cellIndex].top = 'T';
-                  next[cellIndex].left = 't';
-                  if (mode === 'tutorial') {
-                      setTimeout(() => setL4Hint("習慣上我們會把大寫放在前面喔！系統已自動幫你校正。"), 10);
-                      setTimeout(() => setL4Hint(""), 3000);
-                  }
-              } else if (combined === 'WR') {
-                  next[cellIndex].top = 'R';
-                  next[cellIndex].left = 'W';
-              }
               return next;
           });
 
-          if (mode === 'tutorial' && pStep === 1 && cellIndex === 0) {
+          // Auto-correct without triggering infinite loop
+          let combined = (source === 'top' ? gene : punnettGrid[cellIndex].top) + (source === 'left' ? gene : punnettGrid[cellIndex].left);
+          if (combined === 'tT') {
+             setTimeout(() => {
+                setPunnettGrid(currentGrid => {
+                   const corrected = [...currentGrid];
+                   corrected[cellIndex].top = 'T'; corrected[cellIndex].left = 't';
+                   return corrected;
+                });
+                setL4Hint("習慣上我們會把大寫放在前面喔！系統已自動幫你校正。");
+                setTimeout(() => setL4Hint(""), 3000);
+             }, 50);
+          }
+
+          if (pStep === 0 && cellIndex === 0) {
              setTimeout(() => {
                setPunnettGrid(currentGrid => {
-                 if(currentGrid[0].top && currentGrid[0].left) setPStep(2); 
+                 if(currentGrid[0].top && currentGrid[0].left) setPStep(1); 
                  return currentGrid;
                });
-             }, 100);
+             }, 150);
           }
         };
 
-        const getPlantVisual = (topG, leftG, cellIndex) => {
+        const getPlantVisual = (topG, leftG) => {
           if (!topG || !leftG) return null;
           let combined = topG + leftG;
-
-          if (config.parentType === 'pea') return { visual: combined.includes('T') ? 'tall' : 'short', genes: combined };
-          else { 
-            if (combined === 'RR') return { visual: 'red', genes: combined };
-            if (combined === 'WW') return { visual: 'white', genes: combined };
-            if (combined === 'RW' || combined === 'WR') {
-                return { visual: cellIndex === 1 || cellIndex === 2 ? 'flower-pink' : 'flower-spotted', genes: 'RW' };
-            }
-          }
+          return { visual: combined.includes('T') ? 'tall' : 'short', genes: combined };
         };
 
-        let text = "";
-        if (mode === 'bonus') {
-            text = isGridFull ? config.textSuccess : config.text0;
-        } else {
-            if (isGridFull) text = config.textSuccess;
-            else if (pStep === 0) text = config.text0;
-            else if (pStep === 1) text = config.text1;
-            else text = config.text2;
-        }
+        let text = isGridFull ? config.textSuccess : (pStep === 0 ? config.text0 : config.text1);
 
         return (
           <>
             <Notebook text={text} subText={config.title} success={isGridFull ? "完美破解！" : ""}>
-              {isGridFull && mode === 'tutorial' && ( <WoodButton onClick={() => goToLevel(5)}>➡️ 進入總複習實戰</WoodButton> )}
-              {isGridFull && mode === 'bonus' && ( <WoodButton onClick={() => goToLevel(1)}>🔄 重新體驗孟德爾的豌豆之謎</WoodButton> )}
+              {isGridFull && ( <WoodButton onClick={() => goToLevel(5)}>➡️ 進入總複習實戰</WoodButton> )}
             </Notebook>
             <FarmStage>
-              <div className="bg-[#a1887f] p-4 md:p-8 rounded-2xl shadow-2xl border-4 border-[#5d4037] box-content select-none relative mt-16 md:mt-0">
-                <div className="grid grid-cols-[auto_auto_1fr_1fr] gap-x-3 md:gap-x-6 gap-y-4 md:gap-y-6 items-center justify-items-center">
-                   
-                   <div className="col-span-2"></div>
-                   <div className="relative">
-                     {mode === 'tutorial' && pStep === 0 && (
-                       <div className="absolute top-[-35px] left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-                          <span className="bg-white/90 px-3 py-1 rounded-full text-xs font-bold text-green-800 shadow-sm border-2 border-green-200">已自動拆解</span>
-                       </div>
-                     )}
-                     <DraggableGene gene={config.pTop[0]} source="top" index={0} colorTheme="green" />
-                     {mode === 'tutorial' && pStep === 1 && <div className="absolute h-10 md:h-12 w-1 border-r-4 border-dashed border-yellow-400 left-1/2 top-full z-10 animate-pulse pointer-events-none"></div>}
-                   </div>
-                   <DraggableGene gene={config.pTop[1]} source="top" index={1} colorTheme="green" />
+              <div className="bg-[#a1887f] p-4 md:p-8 rounded-2xl shadow-2xl border-4 border-[#5d4037] box-content select-none relative mt-16 md:mt-24">
+                <div className="flex flex-col items-center w-full">
+                    {/* Top Label */}
+                    <div className="ml-[60px] md:ml-[80px] mb-6">
+                        <span className="font-bold text-green-800 bg-white/90 px-6 py-2 rounded-full shadow-sm border-2 border-green-200 text-lg md:text-xl">{config.topLabel}</span>
+                    </div>
 
-                   <div className="row-span-2 pr-2 md:pr-6 flex flex-col items-center justify-center">
-                      {mode === 'tutorial' && pStep === 0 ? (
-                         <div className="flex flex-col items-center">
-                            <Plant type="pea" height="tall" name="高莖" generation={config.genF} label="[ Tt ]" />
-                            <div className="flex gap-2 mt-4 relative">
-                                {!draggedLeftIds.includes(0) && <DraggableGene gene={config.pLeft[0]} source="leftPlant" id={0} index={0} colorTheme="orange" />}
-                                {!draggedLeftIds.includes(1) && <DraggableGene gene={config.pLeft[1]} source="leftPlant" id={1} index={1} colorTheme="orange" />}
-                                <div className="absolute top-14 left-1/2 -translate-x-1/2 whitespace-nowrap bg-yellow-100 text-yellow-800 px-3 py-1 rounded shadow-md animate-bounce text-sm font-bold border border-yellow-300">
-                                    拖曳拆解！
-                                </div>
+                    <div className="flex">
+                        {/* Left Label */}
+                        <div className="flex items-center mr-6 md:mr-8">
+                            <span className="font-bold text-orange-800 bg-white/90 px-2 py-6 rounded-full shadow-sm border-2 border-orange-200 whitespace-nowrap text-lg md:text-xl" style={{ writingMode: 'vertical-rl' }}>{config.leftLabel}</span>
+                        </div>
+
+                        {/* 3x3 Grid elements */}
+                        <div className="grid grid-cols-[auto_auto_auto] gap-4 md:gap-6 items-center justify-items-center">
+                            {/* Row 1 */}
+                            <div></div>
+                            <div className="relative">
+                                <DraggableGene gene={config.pTop[0]} source="top" index={0} colorTheme="green" />
+                                {pStep === 0 && <div className="absolute h-10 md:h-12 w-1 border-r-4 border-dashed border-yellow-400 left-1/2 top-full z-10 animate-pulse pointer-events-none"></div>}
                             </div>
-                         </div>
-                      ) : mode === 'tutorial' ? (
-                         <div className="flex flex-col items-center opacity-50">
-                            <Plant type="pea" height="tall" name="高莖" generation={config.genF} />
-                            <span className="mt-2 bg-white/60 px-2 py-1 rounded text-xs font-bold text-green-800">已拆解</span>
-                         </div>
-                      ) : (
-                         <div className="flex flex-col items-center">
-                            <Plant type={config.parentType} height={config.parentType === 'pea' ? 'tall' : 'medium'} name={mode === 'bonus' ? '粉紅花/斑點' : '高莖'} generation={config.genF} label={`[ ${config.pLeft.join('')} ]`} />
-                         </div>
-                      )}
-                   </div>
+                            <DraggableGene gene={config.pTop[1]} source="top" index={1} colorTheme="green" />
 
-                   <div 
-                     onDragOver={e => e.preventDefault()}
-                     onDrop={e => handleLeftAxisDrop(e, 0)}
-                     className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center transition-all relative ${mode === 'tutorial' && !leftAxis[0] ? 'border-4 border-dashed border-orange-300 bg-white/30' : ''}`}
-                   >
-                      {mode === 'tutorial' ? (
-                         leftAxis[0] ? (
-                           <>
-                             <DraggableGene gene={leftAxis[0]} source="left" index={0} colorTheme="orange" />
-                             {pStep === 1 && <div className="absolute w-10 md:w-12 h-1 border-b-4 border-dashed border-yellow-400 top-1/2 left-full z-10 animate-pulse pointer-events-none"></div>}
-                           </>
-                         ) : <span className="text-orange-800/30 font-bold text-xl">+</span>
-                      ) : (
-                         <DraggableGene gene={config.pLeft[0]} source="left" index={0} colorTheme="orange" />
-                      )}
-                   </div>
+                            {/* Row 2 */}
+                            <div className="relative">
+                                <DraggableGene gene={config.pLeft[0]} source="left" index={0} colorTheme="orange" />
+                                {pStep === 0 && <div className="absolute w-10 md:w-12 h-1 border-b-4 border-dashed border-yellow-400 top-1/2 left-full z-10 animate-pulse pointer-events-none"></div>}
+                            </div>
+                            <DropCell cellData={punnettGrid[0]} onDrop={(e) => handleGridDrop(e, 0)} isDemoCell={pStep === 0} visualData={getPlantVisual(punnettGrid[0].top, punnettGrid[0].left)} generation={config.genChild} />
+                            <DropCell cellData={punnettGrid[1]} onDrop={(e) => handleGridDrop(e, 1)} isDemoCell={false} visualData={getPlantVisual(punnettGrid[1].top, punnettGrid[1].left)} generation={config.genChild} />
 
-                   <DropCell cellData={punnettGrid[0]} onDrop={(e) => handleGridDrop(e, 0)} isDemoCell={mode === 'tutorial' && pStep === 1} visualData={getPlantVisual(punnettGrid[0].top, punnettGrid[0].left, 0)} generation={config.genChild} />
-                   <DropCell cellData={punnettGrid[1]} onDrop={(e) => handleGridDrop(e, 1)} isDemoCell={false} visualData={getPlantVisual(punnettGrid[1].top, punnettGrid[1].left, 1)} generation={config.genChild} />
-
-                   <div 
-                     onDragOver={e => e.preventDefault()}
-                     onDrop={e => handleLeftAxisDrop(e, 1)}
-                     className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center transition-all ${mode === 'tutorial' && !leftAxis[1] ? 'border-4 border-dashed border-orange-300 bg-white/30' : ''}`}
-                   >
-                      {mode === 'tutorial' ? (
-                         leftAxis[1] ? <DraggableGene gene={leftAxis[1]} source="left" index={1} colorTheme="orange" /> : <span className="text-orange-800/30 font-bold text-xl">+</span>
-                      ) : (
-                         <DraggableGene gene={config.pLeft[1]} source="left" index={1} colorTheme="orange" />
-                      )}
-                   </div>
-
-                   <DropCell cellData={punnettGrid[2]} onDrop={(e) => handleGridDrop(e, 2)} isDemoCell={false} visualData={getPlantVisual(punnettGrid[2].top, punnettGrid[2].left, 2)} generation={config.genChild} />
-                   <DropCell cellData={punnettGrid[3]} onDrop={(e) => handleGridDrop(e, 3)} isDemoCell={false} visualData={getPlantVisual(punnettGrid[3].top, punnettGrid[3].left, 3)} generation={config.genChild} />
-
+                            {/* Row 3 */}
+                            <DraggableGene gene={config.pLeft[1]} source="left" index={1} colorTheme="orange" />
+                            <DropCell cellData={punnettGrid[2]} onDrop={(e) => handleGridDrop(e, 2)} isDemoCell={false} visualData={getPlantVisual(punnettGrid[2].top, punnettGrid[2].left)} generation={config.genChild} />
+                            <DropCell cellData={punnettGrid[3]} onDrop={(e) => handleGridDrop(e, 3)} isDemoCell={false} visualData={getPlantVisual(punnettGrid[3].top, punnettGrid[3].left)} generation={config.genChild} />
+                        </div>
+                    </div>
                 </div>
               </div>
-              
-              <div className="h-12 mt-6 flex justify-center w-full pointer-events-none">
+              <div className="h-12 mt-6 flex justify-center w-full pointer-events-none z-50">
                  {l4Hint && (
-                   <div className="bg-yellow-100 border-2 border-yellow-400 text-yellow-800 px-6 py-2 rounded-full font-bold shadow-lg animate-bounce text-center">
-                      💡 {l4Hint}
-                   </div>
+                   <div className="bg-yellow-100 border-2 border-yellow-400 text-yellow-800 px-6 py-2 rounded-full font-bold shadow-lg animate-bounce text-center">💡 {l4Hint}</div>
                  )}
               </div>
             </FarmStage>
@@ -937,13 +841,13 @@
       // --- 渲染關卡 5 專屬內部方格組件 ---
       const renderL5Punnett = (mode) => {
         const config = mode === 'p' ? {
-            title: "棋盤方格法 (P × P)", pTop: ['T', 'T'], pLeft: ['t', 't'], parentType: 'pea', genF: "親代 P", genChild: "第一子代 F1",
-            text0: "請將親代 P [ TT ] 與 [ tt ] 的遺傳因子填入方格中，預測第一子代 (F1)。",
-            textSuccess: "推演完成！\n請點擊下方按鈕返回植物流程圖，填寫正確的遺傳因子。"
+            title: "棋盤方格法 (P × P)", pTop: ['T', 'T'], pLeft: ['t', 't'], 
+            topLabel: "純品系高莖親代 (TT)", leftLabel: "純品系矮莖親代 (tt)", genChild: "第一子代 F1",
+            text0: "請將「純品系高莖」與「純品系矮莖」的遺傳因子拖曳至方格內，預測第一子代 (F1)。",
         } : {
-            title: "棋盤方格法 (F1 × F1)", pTop: ['T', 't'], pLeft: ['T', 't'], parentType: 'pea', genF: "第一子代 F1", genChild: "第二子代 F2",
-            text0: "請將第一子代 (F1) [ Tt ] 與 [ Tt ] 的遺傳因子填入方格中，預測第二子代 (F2)。",
-            textSuccess: "推演完成！\n請點擊下方按鈕返回植物流程圖，填寫正確的遺傳因子。"
+            title: "棋盤方格法 (F1 × F1)", pTop: ['T', 't'], pLeft: ['T', 't'], 
+            topLabel: "第一子代 (Tt)", leftLabel: "第一子代 (Tt)", genChild: "第二子代 F2",
+            text0: "請將第一子代 (F1) 的遺傳因子拖曳至方格內，預測第二子代 (F2)。",
         };
 
         const isGridFull = punnettGrid.every(cell => cell.top !== null && cell.left !== null);
@@ -956,24 +860,28 @@
           const col = cellIndex % 2;
           const row = Math.floor(cellIndex / 2);
 
-          if (source === 'top' && sourceIndex !== col) {
-              setL4Hint("請拖曳到對應的『正下方』格子喔！"); setTimeout(() => setL4Hint(""), 2000); return;
-          }
-          if (source === 'left' && sourceIndex !== row) {
-              setL4Hint("請拖曳到對應的『正右方』格子喔！"); setTimeout(() => setL4Hint(""), 2000); return;
-          }
+          if (source === 'top' && sourceIndex !== col) { setL4Hint("請拖曳到對應的『正下方』格子喔！"); setTimeout(() => setL4Hint(""), 2000); return; }
+          if (source === 'left' && sourceIndex !== row) { setL4Hint("請拖曳到對應的『正右方』格子喔！"); setTimeout(() => setL4Hint(""), 2000); return; }
 
           setPunnettGrid(prev => {
               const next = [...prev];
               next[cellIndex] = { ...next[cellIndex] };
               if (source === 'top') next[cellIndex].top = gene;
               if (source === 'left') next[cellIndex].left = gene;
-              let combined = (next[cellIndex].top || '') + (next[cellIndex].left || '');
-              if (combined === 'tT') {
-                  next[cellIndex].top = 'T'; next[cellIndex].left = 't';
-              }
               return next;
           });
+
+          // 自動校正
+          let combined = (source === 'top' ? gene : punnettGrid[cellIndex].top) + (source === 'left' ? gene : punnettGrid[cellIndex].left);
+          if (combined === 'tT') {
+             setTimeout(() => {
+                setPunnettGrid(currentGrid => {
+                   const corrected = [...currentGrid];
+                   corrected[cellIndex].top = 'T'; corrected[cellIndex].left = 't';
+                   return corrected;
+                });
+             }, 50);
+          }
         };
 
         const getPlantVisualL5 = (topG, leftG) => {
@@ -983,9 +891,13 @@
           return { visual: combined.includes('T') ? 'tall' : 'short', genes: combined };
         };
 
+        let summaryText = mode === 'p' 
+            ? "推演完成！\n\n子代 100% 都是高莖 [ Tt ]！\n請點擊下方按鈕返回植物流程圖。"
+            : "推演完成！\n\n出現了高莖 3 : 矮莖 1 (TT, Tt, tt)！\n請點擊下方按鈕返回植物流程圖。";
+
         return (
           <>
-            <Notebook text={isGridFull ? config.textSuccess : config.text0} subText={config.title} success={isGridFull ? "推演完成！" : ""}>
+            <Notebook text={isGridFull ? summaryText : config.text0} subText={config.title} success={isGridFull ? "推演完成！" : ""}>
               {isGridFull && (
                  <WoodButton onClick={() => {
                     setL5View('main');
@@ -996,29 +908,40 @@
               )}
             </Notebook>
             <FarmStage>
-              <div className="bg-[#a1887f] p-4 md:p-8 rounded-2xl shadow-2xl border-4 border-[#5d4037] box-content select-none relative mt-16 md:mt-0">
-                <div className="grid grid-cols-[auto_auto_1fr_1fr] gap-x-3 md:gap-x-6 gap-y-4 md:gap-y-6 items-center justify-items-center">
-                   <div className="col-span-2"></div>
-                   <div className="relative">
-                     <DraggableGene gene={config.pTop[0]} source="top" index={0} colorTheme="green" />
-                   </div>
-                   <DraggableGene gene={config.pTop[1]} source="top" index={1} colorTheme="green" />
-                   <div className="row-span-2 pr-2 md:pr-6 flex flex-col items-center justify-center">
-                      <Plant type={config.parentType} height={config.parentType === 'pea' ? 'tall' : 'medium'} name={mode === 'p' ? '親代 P' : '第一子代 F1'} generation={config.genF} label={`[ ${config.pLeft.join('')} ]`} />
-                   </div>
-                   <div className="relative">
-                      <DraggableGene gene={config.pLeft[0]} source="left" index={0} colorTheme="orange" />
-                   </div>
-                   <DropCell cellData={punnettGrid[0]} onDrop={(e) => handleGridDropL5(e, 0)} visualData={getPlantVisualL5(punnettGrid[0].top, punnettGrid[0].left)} generation={config.genChild} />
-                   <DropCell cellData={punnettGrid[1]} onDrop={(e) => handleGridDropL5(e, 1)} visualData={getPlantVisualL5(punnettGrid[1].top, punnettGrid[1].left)} generation={config.genChild} />
-                   <div className="relative">
-                      <DraggableGene gene={config.pLeft[1]} source="left" index={1} colorTheme="orange" />
-                   </div>
-                   <DropCell cellData={punnettGrid[2]} onDrop={(e) => handleGridDropL5(e, 2)} visualData={getPlantVisualL5(punnettGrid[2].top, punnettGrid[2].left)} generation={config.genChild} />
-                   <DropCell cellData={punnettGrid[3]} onDrop={(e) => handleGridDropL5(e, 3)} visualData={getPlantVisualL5(punnettGrid[3].top, punnettGrid[3].left)} generation={config.genChild} />
-                </div>
+              <div className="bg-[#a1887f] p-4 md:p-8 rounded-2xl shadow-2xl border-4 border-[#5d4037] box-content select-none relative mt-16 md:mt-24">
+                  <div className="flex flex-col items-center w-full">
+                      {/* Top Label */}
+                      <div className="ml-[60px] md:ml-[80px] mb-6">
+                          <span className="font-bold text-green-800 bg-white/90 px-6 py-2 rounded-full shadow-sm border-2 border-green-200 text-lg md:text-xl">{config.topLabel}</span>
+                      </div>
+
+                      <div className="flex">
+                          {/* Left Label */}
+                          <div className="flex items-center mr-6 md:mr-8">
+                              <span className="font-bold text-orange-800 bg-white/90 px-2 py-6 rounded-full shadow-sm border-2 border-orange-200 whitespace-nowrap text-lg md:text-xl" style={{ writingMode: 'vertical-rl' }}>{config.leftLabel}</span>
+                          </div>
+
+                          {/* 3x3 Grid elements */}
+                          <div className="grid grid-cols-[auto_auto_auto] gap-4 md:gap-6 items-center justify-items-center">
+                              {/* Row 1 */}
+                              <div></div>
+                              <DraggableGene gene={config.pTop[0]} source="top" index={0} colorTheme="green" />
+                              <DraggableGene gene={config.pTop[1]} source="top" index={1} colorTheme="green" />
+
+                              {/* Row 2 */}
+                              <DraggableGene gene={config.pLeft[0]} source="left" index={0} colorTheme="orange" />
+                              <DropCell cellData={punnettGrid[0]} onDrop={(e) => handleGridDropL5(e, 0)} isDemoCell={false} visualData={getPlantVisualL5(punnettGrid[0].top, punnettGrid[0].left)} generation={config.genChild} />
+                              <DropCell cellData={punnettGrid[1]} onDrop={(e) => handleGridDropL5(e, 1)} isDemoCell={false} visualData={getPlantVisualL5(punnettGrid[1].top, punnettGrid[1].left)} generation={config.genChild} />
+
+                              {/* Row 3 */}
+                              <DraggableGene gene={config.pLeft[1]} source="left" index={1} colorTheme="orange" />
+                              <DropCell cellData={punnettGrid[2]} onDrop={(e) => handleGridDropL5(e, 2)} isDemoCell={false} visualData={getPlantVisualL5(punnettGrid[2].top, punnettGrid[2].left)} generation={config.genChild} />
+                              <DropCell cellData={punnettGrid[3]} onDrop={(e) => handleGridDropL5(e, 3)} isDemoCell={false} visualData={getPlantVisualL5(punnettGrid[3].top, punnettGrid[3].left)} generation={config.genChild} />
+                          </div>
+                      </div>
+                  </div>
               </div>
-              <div className="h-12 mt-6 flex justify-center w-full pointer-events-none">
+              <div className="h-12 mt-6 flex justify-center w-full pointer-events-none z-50">
                  {l4Hint && (
                    <div className="bg-yellow-100 border-2 border-yellow-400 text-yellow-800 px-6 py-2 rounded-full font-bold shadow-lg animate-bounce text-center">💡 {l4Hint}</div>
                  )}
@@ -1028,8 +951,7 @@
         );
       };
 
-      // --- 渲染關卡 5：完整推演總複習 ---
-      const renderLevel5 = () => {
+      const renderLevel5Main = () => {
         if (l5View === 'punnett-p') return renderL5Punnett('p');
         if (l5View === 'punnett-f1') return renderL5Punnett('f1');
 
@@ -1106,7 +1028,7 @@
                   {/* 棋盤方格按鈕 P x P */}
                   {l5Step === 1 && (
                      <div className="flex flex-col items-center my-6 animate-fade-in-up w-full px-8">
-                        <WoodButton onClick={() => openL5Punnett('p')} variant="secondary">➡️ 棋盤方格法 (P × P)</WoodButton>
+                        <WoodButton onClick={() => openL5Punnett('p')} variant="secondary">➡️ 開啟棋盤方格法 (P × P)</WoodButton>
                      </div>
                   )}
 
@@ -1132,7 +1054,7 @@
                   {/* 棋盤方格按鈕 F1 x F1 */}
                   {l5Step === 4 && (
                      <div className="flex flex-col items-center my-6 animate-fade-in-up w-full px-8">
-                        <WoodButton onClick={() => openL5Punnett('f1')} variant="secondary">➡️ 棋盤方格法 (F1 × F1)</WoodButton>
+                        <WoodButton onClick={() => openL5Punnett('f1')} variant="secondary">➡️ 開啟棋盤方格法 (F1 × F1)</WoodButton>
                      </div>
                   )}
 
@@ -1168,6 +1090,90 @@
             </FarmStage>
           </>
         );
+      };
+
+      // --- 渲染關卡 6：番外篇二選一 ---
+      const renderLevel6 = () => {
+         const handleGuess = (guess) => {
+            setL6Error("");
+            setL6Success("");
+            
+            if (l6Plant === 'mirabilis') {
+               if (guess === 'pink') {
+                  setL6GuessResult('correct');
+                  setL6Success("答對了！\n\n這就是【不完全顯性】！\n因為紅花 R 和白花 W 勢均力敵，只好各退一步混合成粉紅色。");
+               } else {
+                  setL6GuessResult('wrong');
+                  setL6Error("不對喔！想想看，如果紅跟白『勢均力敵』，混合在一起會變什麼顏色？");
+               }
+            } else if (l6Plant === 'camellia') {
+               if (guess === 'spotted') {
+                  setL6GuessResult('correct');
+                  setL6Success("答對了！\n\n這就是【共顯性】！\n紅花 R 和白花 W 全都要表現，互不退讓，所以紅白同時出現在花瓣上！");
+               } else {
+                  setL6GuessResult('wrong');
+                  setL6Error("不對喔！想想看，如果紅跟白『互不相讓、全都要表現』，花朵會變成什麼樣子？");
+               }
+            }
+         };
+
+         // Screen 1: Choose Plant
+         if (!l6Plant) {
+            return (
+               <>
+                  <Notebook text={"小大師你好！我是研究花朵的植物學家。\n\n孟德爾法則並不是唯一的真理喔！大自然還藏著其他的驚喜。\n\n請在右邊選擇一株神秘花朵，讓我們來看看還有什麼有趣的遺傳現象！"} subText={levelNames[6]}>
+                  </Notebook>
+                  <FarmStage>
+                     <div className="flex flex-col items-center justify-center gap-8 h-full w-full max-w-sm mx-auto">
+                        <WoodButton className="h-32 text-2xl !bg-pink-600 hover:!bg-pink-700 !border-pink-800 text-white" onClick={() => setL6Plant('mirabilis')}>🌺 探索神秘花朵 A</WoodButton>
+                        <WoodButton className="h-32 text-2xl !bg-red-600 hover:!bg-red-700 !border-red-800 text-white" onClick={() => setL6Plant('camellia')}>🌸 探索神秘花朵 B</WoodButton>
+                     </div>
+                  </FarmStage>
+               </>
+            );
+         }
+
+         // Screen 2: Guessing Game
+         let text = `你選擇了${l6Plant === 'mirabilis' ? '紫茉莉' : '茶花'}！\n\n這是一種特別的植物，它有純品系的紅花 [ RR ] 與純品系的白花 [ WW ]。\n\n如果將它們交配，產生帶有 [ RW ] 基因的子代，你猜花朵會開出什麼顏色？`;
+         
+         return (
+            <>
+               <Notebook text={text} subText={levelNames[6]} error={l6Error} success={l6Success}>
+                  {!l6GuessResult || l6GuessResult === 'wrong' ? (
+                     <div className="grid grid-cols-2 gap-3 mt-4">
+                        <WoodButton onClick={() => handleGuess('red')} variant="secondary">🔴 紅色</WoodButton>
+                        <WoodButton onClick={() => handleGuess('white')} variant="secondary">⚪ 白色</WoodButton>
+                        <WoodButton onClick={() => handleGuess('pink')} variant="secondary">🌸 粉紅色</WoodButton>
+                        <WoodButton onClick={() => handleGuess('spotted')} variant="secondary">🎯 紅白斑點</WoodButton>
+                     </div>
+                  ) : (
+                     <WoodButton onClick={() => {setL6Plant(null); setL6GuessResult(null); setL6Success(""); setL6Error("");}} className="mt-4">🔙 試試另一種花朵</WoodButton>
+                  )}
+               </Notebook>
+               
+               <FarmStage>
+                  <div className="flex flex-col items-center justify-center w-full h-full gap-12 mt-10">
+                     {/* Parents */}
+                     <div className="flex justify-center items-end gap-6 md:gap-12 border-b-2 border-dashed border-green-300 pb-10">
+                         <Plant type="flower-red" height="medium" name="純品系紅花" generation="親代 P" label="[ RR ]" />
+                         <div className="text-3xl font-black text-amber-800 mb-8">X</div>
+                         <Plant type="flower-white" height="medium" name="純品系白花" generation="親代 P" label="[ WW ]" />
+                     </div>
+
+                     {/* Child */}
+                     <div className="flex justify-center w-full mt-4">
+                         {l6GuessResult !== 'correct' ? (
+                            <SeedBox gene="[ RW ]" generation="第一子代 F1" />
+                         ) : (
+                            <div className="animate-fade-in-up scale-125 transform mt-4">
+                               <Plant type={l6Plant === 'mirabilis' ? 'flower-pink' : 'flower-spotted'} height="medium" name={l6Plant === 'mirabilis' ? '粉紅花' : '斑點花'} generation="第一子代 F1" label="[ RW ]" />
+                            </div>
+                         )}
+                     </div>
+                  </div>
+               </FarmStage>
+            </>
+         );
       };
 
       return (
@@ -1206,9 +1212,9 @@
           {level === 1 && renderLevel1()} 
           {level === 2 && renderLevel2()} 
           {level === 3 && renderLevel3()} 
-          {level === 4 && renderPunnettSquare('tutorial')} 
-          {level === 5 && renderLevel5()}
-          {level === 6 && renderPunnettSquare('bonus')}
+          {level === 4 && renderLevel4Tutorial()} 
+          {level === 5 && renderLevel5Main()}
+          {level === 6 && renderLevel6()}
           <style dangerouslySetInnerHTML={{__html: `
             @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
             .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
@@ -1239,6 +1245,10 @@
             }
             .animate-pull-out {
               animation: pullOut 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            }
+
+            .writing-vertical-rl {
+              writing-mode: vertical-rl;
             }
           `}} />
         </div>
