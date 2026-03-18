@@ -5,14 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>孟德爾的豌豆之謎</title>
   
-  <!-- 載入 React 核心庫 -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   
-  <!-- 載入 Babel 以在瀏覽器中編譯 JSX -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
-  <!-- 載入 Tailwind CSS 框架 -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="m-0 p-0 overflow-hidden">
@@ -281,18 +278,14 @@
           
           {isComplete && visualData && ( 
             <div className="absolute inset-0 flex flex-col items-center justify-center m-2 rounded-xl bg-white/95 shadow-md animate-fade-in-up border-2 border-green-200">
-               <span className={`text-2xl md:text-3xl font-black ${
+               <span className={`text-xl md:text-3xl font-black ${
                   visualData.visual === 'tall' ? 'text-green-700' :
                   visualData.visual === 'short' ? 'text-amber-700' :
-                  visualData.visual === 'red' ? 'text-red-600' :
-                  visualData.visual === 'white' ? 'text-gray-500' :
                   visualData.visual === 'flower-pink' ? 'text-pink-500' :
                   'text-red-800'
                }`}>
                   {visualData.visual === 'tall' ? '高莖' :
                    visualData.visual === 'short' ? '矮莖' :
-                   visualData.visual === 'red' ? '紅花' :
-                   visualData.visual === 'white' ? '白花' :
                    visualData.visual === 'flower-pink' ? '粉紅花' :
                    '斑點花'}
                </span>
@@ -314,7 +307,7 @@
       const levelNames = [
         "第零關：尋找純品系的考驗",
         "第一關：實驗現象觀察",
-        "第二關：遺傳因子假說 (單數的困境)",
+        "第二關：遺傳因子假說 (單個or成對)",
         "第三關：成對假說與顯隱性法則",
         "第四關：棋盤方格與表徵預測",
         "第五關：完整推演 (親代到子代)",
@@ -388,7 +381,6 @@
       // --- 渲染遊戲封面 (關卡 -1) ---
       const renderCover = () => (
         <div className="flex flex-col items-center justify-center w-full h-screen bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9] relative overflow-hidden">
-          {/* 背景裝飾植物 */}
           <div className="absolute top-10 left-10 opacity-30 transform -rotate-12 scale-150 pointer-events-none drop-shadow-xl">
             <Plant type="pea" height="tall" />
           </div>
@@ -396,7 +388,6 @@
             <Plant type="pea" height="short" />
           </div>
 
-          {/* 主內容區塊 */}
           <div className="bg-white/80 p-10 md:p-16 rounded-3xl shadow-2xl border-4 border-[#a5d6a7] z-10 text-center max-w-3xl mx-4 backdrop-blur-sm animate-fade-in-up">
             <h1 className="text-4xl md:text-6xl font-black text-[#2e7d32] mb-6 drop-shadow-md tracking-wide">
               🌻 孟德爾的豌豆之謎
@@ -404,7 +395,7 @@
             <p className="text-lg md:text-2xl text-[#5c4033] leading-relaxed mb-10 font-bold">
               19世紀的修道院花園裡，隱藏著生命傳承的偉大密碼...<br/>
               跟隨遺傳學之父孟德爾的腳步，親手種下豌豆，<br/>
-              一步步解開控制高矮、花色的世紀之謎！
+              一步步解開控制高矮的世紀之謎！
             </p>
             <button 
               onClick={() => goToLevel(0)}
@@ -424,8 +415,8 @@
         if (l0Step === 2 && !isPulling) text = `太好了！矮莖已經被淘汰。\n\n我們要把剩下的高莖繼續自交，直到再也不會生出矮莖為止！\n\n(目前繁衍代數：第 ${l0Gen} 代)`;
         if (l0Step === 3) text = "太棒了！經過好幾個世代的淘汰與自交，現在不管怎麼生，100% 都是高莖了！\n\n特徵終於『穩定』下來了。";
         if (l0Step === 4) text = "等等，特徵穩定就夠了嗎？\n\n如果在惡劣的環境下，它還能保持純品系的特徵嗎？";
-        if (l0Step === 5) text = "天啊！這批純品系的種子種在惡劣的環境中，因為缺乏營養發育不良，只能長得矮矮的！\n\n你覺得如果收集這些『因為環境而長不高』的豌豆種子，拿回營養的好土裡重新種植，下一代會長出什麼？";
-        if (l0Step === 6) text = "這就是『純品系』的真諦！\n\n只要遺傳穩定下來，即使惡劣的環境讓它這一代發育不良、長不高，隱藏在種子裡的『高莖特徵（基因）』也絕不會改變！\n\n(💡 順帶一提，純品系的『矮莖豌豆』也是用一樣的淘汰與自交方式培育出來的喔！)\n\n我們終於準備好可以開始實驗了！";
+        if (l0Step === 5) text = "天啊！這批純品系的種子種在惡劣的環境中，因為發育不良，只能長得矮矮的！\n\n你覺得如果收集這些『因為環境而長不高』的豌豆種子，拿回好土裡重新種植，下一代會長出什麼？";
+        if (l0Step === 6) text = "這就是『純品系』的真諦！\n\n只要遺傳穩定下來，即使惡劣的環境讓它這一代發育不良長不高，隱藏在種子裡的『高莖特徵（基因）』也絕不會改變！\n\n(💡 順帶一提，純品系的『矮莖豌豆』也是用一樣的淘汰與自交方式培育出來的喔！)\n\n我們終於準備好可以開始實驗了！";
 
         return (
           <>
@@ -440,7 +431,6 @@
             </Notebook>
 
             <FarmStage isRaining={l0Step === 5}>
-              {/* 第1代：1株野外高莖 */}
               {l0Step === 0 && (
                 <div className="flex justify-center w-full animate-fade-in-up items-end mt-12">
                    <div className="relative">
@@ -450,10 +440,8 @@
                 </div>
               )}
               
-              {/* 第2代或第3代的自交結果與拔除過程 */}
               {(l0Step === 1 || l0Step === 2) && (
                 <div className="flex justify-center w-full animate-fade-in-up items-end flex-wrap gap-6 border-t-2 border-dashed border-green-300 pt-8 mt-4" key={`gen-${l0Gen}`}>
-                   {/* 高莖群 (Gen2: 4株, Gen3: 3株) */}
                    {Array.from({ length: l0Gen === 2 ? 4 : 3 }).map((_, i) => (
                       <div className="relative" key={`tall-${i}`}>
                          {(isSelfing && l0Step === 2) && <SelfingArrow />}
@@ -461,7 +449,6 @@
                       </div>
                    ))}
                    
-                   {/* 矮莖群 (Gen2: 2株, Gen3: 1株)，只有在 step 1 顯示，拔除時播放動畫 */}
                    {l0Step === 1 && (
                       <div 
                         className={`relative group cursor-pointer transition-transform flex gap-4 ${isPulling ? 'animate-pull-out pointer-events-none' : 'hover:scale-105'}`} 
@@ -526,11 +513,16 @@
                 </div>
               )}
               {l1Step >= 2 && (
-                <div className="flex justify-center w-full animate-fade-in-up bg-white/40 p-4 rounded-xl shadow-sm border-2 border-white/60 items-end flex-wrap gap-2 mt-4">
-                   <Plant type="pea" height="tall" name="高莖" generation="第二子代 F2" />
-                   <Plant type="pea" height="tall" name="高莖" generation="第二子代 F2" />
-                   <Plant type="pea" height="tall" name="高莖" generation="第二子代 F2" />
-                   <Plant type="pea" height="short" name="矮莖" generation="第二子代 F2" />
+                <div className="flex flex-col items-center w-full mt-4">
+                  <div className="flex justify-center w-full animate-fade-in-up bg-white/40 p-4 rounded-xl shadow-sm border-2 border-white/60 items-end flex-wrap gap-2">
+                     <Plant type="pea" height="tall" name="高莖" generation="第二子代 F2" />
+                     <Plant type="pea" height="tall" name="高莖" generation="第二子代 F2" />
+                     <Plant type="pea" height="tall" name="高莖" generation="第二子代 F2" />
+                     <Plant type="pea" height="short" name="矮莖" generation="第二子代 F2" />
+                  </div>
+                  <div className="mt-4 px-6 py-2 bg-yellow-100 border border-yellow-300 text-yellow-800 rounded-full font-bold shadow-sm animate-fade-in-up">
+                     🌱 實驗數據紀錄：高莖 787 棵、矮莖 277 棵 (比例約 3 : 1)
+                  </div>
                 </div>
               )}
             </FarmStage>
@@ -725,9 +717,9 @@
             textSuccess: "太棒了！\n\n你已經能靠自己完成從親代到子代的完整遺傳推演！"
           },
           'bonus': {
-            title: levelNames[6], parentType: 'flower', pTop: ['R', 'R'], pLeft: ['W', 'W'], genP: "第一子代 F1", genF: "第二子代 F2", genChild: "第一子代 F1", 
-            text0: "小大師你好！我是研究紫茉莉和茶花的植物學家。\n\n請你用『表徵預測方格』幫我預測，把紅花 [ RR ] 和白花 [ WW ] 交配，會長出什麼？",
-            textSuccess: "天啊！居然不是紅花！\n\n原來 R 和 W 勢均力敵，誰也無法遮蔽誰，只好各退一步混在一起，這就是『不完全顯性』！(或者是共顯性，全都要表現！)"
+            title: levelNames[6], parentType: 'flower', pTop: ['R', 'R'], pLeft: ['W', 'W'], genP: "親代 P", genF: "第一子代 F1", genChild: "第一子代 F1", 
+            text0: "小大師你好！我是研究花朵的植物學家。\n\n孟德爾法則並不是唯一！來看看大自然的兩種驚喜：\n1. 【不完全顯性】(紫茉莉)：紅花 [ RR ] 與白花 [ WW ] 交配。\n2. 【共顯性】(茶花)：紅花 [ RR ] 與白花 [ WW ] 交配。\n\n請在方格中配對看看會發生什麼事！",
+            textSuccess: "大自然真奇妙！\n\n上排的【粉紅花】：R和W勢均力敵，只好各退一步混合，這叫『不完全顯性』。\n\n下排的【紅白斑點花】：R和W全都要表現，互不退讓，這叫『共顯性』！"
           }
         }[mode];
 
@@ -783,6 +775,20 @@
               next[cellIndex] = { ...next[cellIndex] };
               if (source === 'top') next[cellIndex].top = gene;
               if (source === 'left') next[cellIndex].left = gene;
+
+              // Auto-correct without triggering render side-effects
+              let combined = (next[cellIndex].top || '') + (next[cellIndex].left || '');
+              if (combined === 'tT') {
+                  next[cellIndex].top = 'T';
+                  next[cellIndex].left = 't';
+                  if (mode === 'tutorial') {
+                      setTimeout(() => setL4Hint("習慣上我們會把大寫放在前面喔！系統已自動幫你校正。"), 10);
+                      setTimeout(() => setL4Hint(""), 3000);
+                  }
+              } else if (combined === 'WR') {
+                  next[cellIndex].top = 'R';
+                  next[cellIndex].left = 'W';
+              }
               return next;
           });
 
@@ -796,23 +802,17 @@
           }
         };
 
-        const getPlantVisual = (topG, leftG) => {
+        const getPlantVisual = (topG, leftG, cellIndex) => {
           if (!topG || !leftG) return null;
           let combined = topG + leftG;
-          if (combined === 'tT') {
-             combined = 'Tt';
-             if (mode === 'tutorial') {
-                setL4Hint("習慣上我們會把大寫放在前面喔！系統已自動幫你校正。");
-                setTimeout(() => setL4Hint(""), 3000);
-             }
-          }
-          if (combined === 'WR') combined = 'RW';
 
           if (config.parentType === 'pea') return { visual: combined.includes('T') ? 'tall' : 'short', genes: combined };
           else { 
             if (combined === 'RR') return { visual: 'red', genes: combined };
             if (combined === 'WW') return { visual: 'white', genes: combined };
-            return { visual: punnettGrid.filter(c => c.top && c.left).length <= 2 ? 'flower-pink' : 'flower-spotted', genes: combined };
+            if (combined === 'RW') {
+                return { visual: cellIndex < 2 ? 'flower-pink' : 'flower-spotted', genes: combined };
+            }
           }
         };
 
@@ -892,8 +892,8 @@
                       )}
                    </div>
 
-                   <DropCell cellData={punnettGrid[0]} onDrop={(e) => handleGridDrop(e, 0)} isDemoCell={mode === 'tutorial' && pStep === 1} visualData={getPlantVisual(punnettGrid[0].top, punnettGrid[0].left)} generation={config.genChild} />
-                   <DropCell cellData={punnettGrid[1]} onDrop={(e) => handleGridDrop(e, 1)} isDemoCell={false} visualData={getPlantVisual(punnettGrid[1].top, punnettGrid[1].left)} generation={config.genChild} />
+                   <DropCell cellData={punnettGrid[0]} onDrop={(e) => handleGridDrop(e, 0)} isDemoCell={mode === 'tutorial' && pStep === 1} visualData={getPlantVisual(punnettGrid[0].top, punnettGrid[0].left, 0)} generation={config.genChild} />
+                   <DropCell cellData={punnettGrid[1]} onDrop={(e) => handleGridDrop(e, 1)} isDemoCell={false} visualData={getPlantVisual(punnettGrid[1].top, punnettGrid[1].left, 1)} generation={config.genChild} />
 
                    <div 
                      onDragOver={e => e.preventDefault()}
@@ -907,8 +907,8 @@
                       )}
                    </div>
 
-                   <DropCell cellData={punnettGrid[2]} onDrop={(e) => handleGridDrop(e, 2)} isDemoCell={false} visualData={getPlantVisual(punnettGrid[2].top, punnettGrid[2].left)} generation={config.genChild} />
-                   <DropCell cellData={punnettGrid[3]} onDrop={(e) => handleGridDrop(e, 3)} isDemoCell={false} visualData={getPlantVisual(punnettGrid[3].top, punnettGrid[3].left)} generation={config.genChild} />
+                   <DropCell cellData={punnettGrid[2]} onDrop={(e) => handleGridDrop(e, 2)} isDemoCell={false} visualData={getPlantVisual(punnettGrid[2].top, punnettGrid[2].left, 2)} generation={config.genChild} />
+                   <DropCell cellData={punnettGrid[3]} onDrop={(e) => handleGridDrop(e, 3)} isDemoCell={false} visualData={getPlantVisual(punnettGrid[3].top, punnettGrid[3].left, 3)} generation={config.genChild} />
 
                 </div>
               </div>
@@ -1015,9 +1015,20 @@
                  <span className="font-bold text-[#8b5a2b]">解謎進度</span>
                  <div className="flex gap-2">
                     {[0, 1, 2, 3, 4, 5, 6].map(l => (
-                      <div key={l} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-sm transition-all ${level === l ? 'bg-[#4ade80] text-green-900 border-2 border-white scale-110' : level > l ? 'bg-[#a5d6a7] text-white' : 'bg-gray-200 text-gray-400'}`}>
-                        {l === 0 ? 'P' : l > level ? l : '✓'}
-                      </div>
+                      <button 
+                        key={l} 
+                        onClick={() => { if(level >= l) goToLevel(l); }}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-sm transition-all ${
+                          level === l 
+                            ? 'bg-[#4ade80] text-green-900 border-2 border-white scale-110' 
+                            : level > l 
+                                ? 'bg-[#a5d6a7] text-white hover:bg-[#4ade80] cursor-pointer' 
+                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
+                        disabled={level < l}
+                      >
+                        {l}
+                      </button>
                     ))}
                  </div>
               </div>
