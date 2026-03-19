@@ -14,6 +14,20 @@
   
   <!-- 載入 Tailwind CSS 框架 -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- 觸控設備支援 (修復 iPad/手機 無法拖曳的問題) -->
+  <link rel="stylesheet" href="https://unpkg.com/mobile-drag-drop@2.3.0-rc.2/default.css">
+  <script src="https://unpkg.com/mobile-drag-drop@2.3.0-rc.2/index.min.js"></script>
+  <script>
+    // 在網頁載入完成後初始化觸控拖曳支援
+    window.addEventListener('DOMContentLoaded', function() {
+        MobileDragDrop.polyfill({
+            holdToDrag: 0 // 設定為 0，手指碰到立刻觸發拖曳，不需要長按
+        });
+        // 加入這行可以避免在 iOS 拖曳時，整個網頁不小心跟著捲動
+        window.addEventListener('touchmove', function() {}, {passive: false});
+    });
+  </script>
 </head>
 <body class="m-0 p-0 overflow-hidden">
   <div id="root"></div>
@@ -208,7 +222,8 @@
             e.dataTransfer.setData('sourceIndex', index);
             if (id !== undefined) e.dataTransfer.setData('id', id);
           }}
-          className={`w-12 h-12 md:w-14 md:h-14 rounded-full border-4 flex items-center justify-center font-black text-2xl md:text-3xl shadow-md cursor-grab active:cursor-grabbing hover:scale-110 transition-transform relative z-20 ${themeClass}`}
+          // 加入 touch-none 避免在 iPad 上拖曳時觸發網頁捲動
+          className={`w-12 h-12 md:w-14 md:h-14 rounded-full border-4 flex items-center justify-center font-black text-2xl md:text-3xl shadow-md cursor-grab active:cursor-grabbing hover:scale-110 transition-transform relative z-20 touch-none ${themeClass}`}
         >
           {gene}
         </div>
@@ -909,7 +924,6 @@
               return next;
           });
 
-          // 自動校正
           let combined = (source === 'top' ? gene : punnettGrid[cellIndex].top) + (source === 'left' ? gene : punnettGrid[cellIndex].left);
           if (combined === 'tT') {
              setTimeout(() => {
@@ -1157,19 +1171,17 @@
             setL6Success("");
             
             if (l6Plant === 'mirabilis') {
+               setL6GuessResult('correct');
                if (guess === 'pink') {
-                  setL6GuessResult('correct');
                   setL6Success("答對了！\n\n這就是【不完全顯性】！\n因為紅花 R 和白花 R' 勢均力敵，誰也無法完全掩蓋誰，只好各退一步混合成粉紅色。");
                } else {
-                  setL6GuessResult('wrong');
                   setL6Error("意想不到吧！其實會開出粉紅色喔！\n\n這就是【不完全顯性】！\n因為紅花 R 和白花 R' 勢均力敵，誰也無法完全掩蓋誰，只好各退一步混合成粉紅色。");
                }
             } else if (l6Plant === 'camellia') {
+               setL6GuessResult('correct');
                if (guess === 'spotted') {
-                  setL6GuessResult('correct');
                   setL6Success("答對了！\n\n這就是【共顯性】！\n紅花 R 和白花 W 全都要表現，互不退讓，所以紅色與白色同時出現在花瓣上！");
                } else {
-                  setL6GuessResult('wrong');
                   setL6Error("意想不到吧！其實會開出紅白斑點喔！\n\n這就是【共顯性】！\n紅花 R 和白花 W 全都要表現，互不退讓，所以紅色與白色同時出現在花瓣上！");
                }
             }
@@ -1210,7 +1222,7 @@
          return (
             <>
                <Notebook text={text} subText={levelNames[6]} error={l6Error} success={l6Success}>
-                  {!l6GuessResult || l6GuessResult === 'wrong' ? (
+                  {!l6GuessResult ? (
                      <div className="grid grid-cols-2 gap-3 mt-4">
                         <WoodButton onClick={() => handleGuess('red')} variant="secondary">🔴 紅色</WoodButton>
                         <WoodButton onClick={() => handleGuess('white')} variant="secondary">⚪ 白色</WoodButton>
